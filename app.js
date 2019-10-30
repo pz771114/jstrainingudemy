@@ -11,13 +11,11 @@ GAME RULES:
 
 //define the variables
 
-var score_one,score_two,activePlayer;
+var currentScore,activePlayer;
 
 //initial the values
-score_one=0;
-score_two=0;
-
-activePlayer=0;
+currentScore = 0;
+activePlayer = 0;
 
 
 //reset the interface values to zero
@@ -53,24 +51,15 @@ function rollHandler(e){
 		var current_dice_value = document.querySelector('#current-'+activePlayer);
 		var current_score = document.querySelector('#score-'+activePlayer);
 		
-		switch(activePlayer){
-			case 0:
-				//player 1
-				var score_one_element = document.querySelector('#score-0');
+		var current_element = document.querySelector('#current-' + activePlayer);
+		currentScore += currentDice;
 				
-				document.querySelector('#current-0').textContent = 0;
-
-				score_one += current_dice_value;
-
-				break;
-			case 1:
-				//player 2
-				break;
-		}
+		current_element.textContent = currentScore;
 
 	}else{
 		//end turn and switch player
 		activePlayer === 0 ?activePlayer = 1 : activePlayer =0;
+		
 		document.querySelector('.player-0-panel').classList.toggle('active');
 		document.querySelector('.player-1-panel').classList.toggle('active');
 	}
