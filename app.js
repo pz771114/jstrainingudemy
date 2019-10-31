@@ -11,11 +11,12 @@ GAME RULES:
 
 //define the variables
 
-var currentScore,activePlayer;
+var roundScore,activePlayer,scores;
 
 //initial the values
-currentScore = 0;
+roundScore = 0;
 activePlayer = 0;
+scores = [0, 0];
 
 
 //reset the interface values to zero
@@ -34,35 +35,82 @@ function rollHandler(e){
 	e.preventDefault();
 
 	//show the dice image
-	var dice = document.querySelector('.dice');	
-	dice.style.display='block';
+	document.querySelector('.dice').style.display='block';
 
 	//set random number 
-	var currentDice = Math.floor(Math.random() * 6 ) + 1;
-	console.log(currentDice);
-	dice.src='dice-'+currentDice+'.png';
+	var dice = Math.floor(Math.random() * 6 ) + 1;
+	console.log(dice);
+	dice.src='dice-'+dice+'.png';
 
 	//check current player if player 1 or player 2
 	activePlayer === 0 ? console.log('player 1') :console.log('player 2') ;
 
-	if(currentDice !==1){
+	if(dice !==1){
 		//roll the dice
 		//updat the score for current player
-		var current_dice_value = document.querySelector('#current-'+activePlayer);
-		var current_score = document.querySelector('#score-'+activePlayer);
+		roundScore += dice;
+		document.querySelector('#current-' + activePlayer).textContent = roundScore;
 		
-		var current_element = document.querySelector('#current-' + activePlayer);
-		currentScore += currentDice;
-				
-		current_element.textContent = currentScore;
-
 	}else{
 		//end turn and switch player
+
+		nextPlayer();
+
+	}
+
+}
+
+
+function nextPlayer(){
 		activePlayer === 0 ?activePlayer = 1 : activePlayer =0;
+		roundScore = 0;
+
+		document.querySelector('#current-0').textContent = 0;
+		document.querySelector('#current-1').textContent = 0;
 		
 		document.querySelector('.player-0-panel').classList.toggle('active');
 		document.querySelector('.player-1-panel').classList.toggle('active');
+
+		document.querySelector('.dice').style.display='none';
+}
+
+
+function checkWinner(){
+	if(scores[activePlayer] >= 30){
+		document.querySelector('#name-' + activePlayer).textContent = 'Winner!';		
+	}else{
+		nextPlayer();
 	}
 }
+//attach click event to hold button
+//when clich hold button, the round score will update the player's score 
+//reset the current player round score to zero, switch to the next player 
+function holdHandler(e){
+	e.preventDefault();
+
+	console.log('roundscore: ',roundScore);
+
+	//add current score to GLOBAL score
+	scores[activePlayer] += roundScore;
+
+	//update the current player socre
+	document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+
+	//check if which player reaches the 100 points is the winner
+	if(scores[activePlayer] >= 20){
+		document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
+		//hide the current player indicator and the dice image
+		document.querySelector('.dice').style.display='none';
+		document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
+		document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
+
+	}else{
+		nextPlayer();
+	}
+}
+
 document.querySelector('.btn-roll').addEventListener('click',rollHandler);
+
+document.querySelector('.btn-hold').addEventListener('click',holdHandler);
+
 
