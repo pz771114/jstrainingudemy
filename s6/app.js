@@ -72,7 +72,9 @@ var UIController = (function () {
         inputType: '.add__type',
         inputDescription: '.add__description',
         inputValue: '.add__value',
-        inputBtn: '.add__btn'
+        inputBtn: '.add__btn',
+		incomeContainer: '.income__list',
+		expenseContainer: '.expenses__list',
     };
 
     return {
@@ -94,8 +96,10 @@ var UIController = (function () {
 			//1. create the html
 			var html;
 			if(type ==='exp'){
-				html = ` <div class="item clearfix" id="expense-${obj.id}">
-                            <div class="item__description">${obj.description}</div>
+				element = DOMStrings.expenseContainer;
+				
+				html =`<div class="item clearfix" id="expense-${obj.id}">
+							<div class="item__description">${obj.description}</div>
                             <div class="right clearfix">
                                 <div class="item__value">- ${obj.value}</div>
                                 <div class="item__percentage">21%</div>
@@ -106,6 +110,8 @@ var UIController = (function () {
                         </div>`;
 				
 			}else if(type ==='inc'){
+				element = DOMStrings.incomeContainer;
+				
 				html=`<div class="item clearfix" id="income-${obj.id}">
                             <div class="item__description">${obj.description}</div>
                             <div class="right clearfix">
@@ -118,16 +124,8 @@ var UIController = (function () {
 			}
 			
 			//2. replace the html
-			var lists;
 			
-			
-			if(type ==='exp'){
-				lists = document.querySelector('.expenses__list');	
-			}else if(type ==='inc'){
-				lists = document.querySelector('.income__list');
-			}
-			
-			lists.insertAdjacentHTML('beforeend',html);
+			document.querySelector(element).insertAdjacentHTML('beforeend',html);
 		}
     };
 })();
