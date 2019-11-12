@@ -75,6 +75,7 @@ var UIController = (function () {
         inputBtn: '.add__btn',
 		incomeContainer: '.income__list',
 		expenseContainer: '.expenses__list',
+		addContainer:'.add__container'
     };
 
     return {
@@ -126,6 +127,13 @@ var UIController = (function () {
 			//2. replace the html
 			
 			document.querySelector(element).insertAdjacentHTML('beforeend',html);
+			
+			//3. clear the input fields
+			var inputs = document.querySelector(DOMStrings.addContainer).querySelectorAll('input');
+			var inputsArray = Array.prototype.slice.call(inputs);
+			inputsArray.forEach(function(input){
+				input.value = '';
+			});
 		}
     };
 })();
