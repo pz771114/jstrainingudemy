@@ -33,11 +33,11 @@ var budgetController = (function () {
 		addItem: function(type, des, val){
 			
 			var newItem;
-			var lastItemIndex = data.allItems[type].length-1;
+			var lastItemIndex = 0 ;
 			
 			//create a new id
 			if( data.allItems[type].length > 0 ){
-				id = data.allItems[type][lastItemIndex].id+1;
+				id = data.allItems[type][data.allItems[type].length-1].id+1;
 			}else
 			{
 				id = 0;
@@ -91,7 +91,26 @@ var budgetController = (function () {
 		},
 		
 		testing: function(){
-			console.table(data);
+			return (data);
+		},
+		
+		deleteItem: function(type, id){
+			var ids=[], index,item;
+			ids = data.allItems[type].map(function(item){
+				return item.id;
+			});
+			
+			index = ids.indexOf(id);
+			if(index !== -1){
+				data.allItems[type].splice(index,1);
+			}
+			
+		},
+		getData:function(){
+			return data.allItems;
+		},
+		setData: function(newData){
+			data.allItems = newData;
 		}
 		
 	};
@@ -114,6 +133,7 @@ var UIController = (function () {
 		budgetIncomePercentage:'.budget__income--percentage',
 		budgetExpense:'.budget__expenses--value',
 		budgetExpensePercentage:'.budget__expenses--percentage',
+		container: '.container'
     };
 
     return {
@@ -145,7 +165,7 @@ var UIController = (function () {
 			if(type ==='exp'){
 				element = DOMStrings.expenseContainer;
 				
-				html =`<div class="item clearfix" id="expense-${obj.id}">
+				html =`<div class="item clearfix" id="exp-${obj.id}">
 							<div class="item__description">${obj.description}</div>
                             <div class="right clearfix">
                                 <div class="item__value">- ${obj.value}</div>
@@ -159,7 +179,7 @@ var UIController = (function () {
 			}else if(type ==='inc'){
 				element = DOMStrings.incomeContainer;
 				
-				html=`<div class="item clearfix" id="income-${obj.id}">
+				html=`<div class="item clearfix" id="inc-${obj.id}">
                             <div class="item__description">${obj.description}</div>
                             <div class="right clearfix">
                                 <div class="item__value">+ ${obj.value}</div>
@@ -176,6 +196,13 @@ var UIController = (function () {
 			
 			
 		},
+		
+		removeItem: function(selector){
+			
+			var em = document.querySelector(selector);
+			em.parentNode.removeChild(em);
+		},
+		
 		displayBudget: function(budget){
 			
 			document.querySelector(DOMStrings.budgetValue).textContent=budget.budget;
@@ -195,7 +222,7 @@ var UIController = (function () {
 
 //global app controller
 var controller = (function (budgetCtrl, UICtrl) {
-
+		
     var setupEventListener = function () {
         var DOM = UICtrl.getDOMStrings();
         document.querySelector(DOM.inputBtn).addEventListener('click', ctrlAddItem);
@@ -205,8 +232,32 @@ var controller = (function (budgetCtrl, UICtrl) {
                 ctrlAddItem();
             }
         });
+		
+		document.querySelector(DOM.container).addEventListener('click',ctrlDeleteItem);
     };
-
+	
+	var ctrlDeleteItem = function(event){
+		id = event.target.parentNode.parentNode.parentNode.parentNode.id;
+		
+		
+		
+		if(id){
+		//1. delete the item from the data structure
+			itemType = id.split('-')[0];
+			itemID = parseInt(id.split('-')[1]);
+			selector = '#'+ itemType +'-'+itemID;
+			
+			budgetCtrl.deleteItem(itemType,itemID);
+		
+		//2. delete the item from UI
+			UICtrl.removeItem(selector);
+			
+		//3. Update and show the new budget
+		
+			updateBudget();
+		}
+	};
+	
     var updateBudget = function(){
 		//1.calculate the budget
 		
@@ -216,7 +267,7 @@ var controller = (function (budgetCtrl, UICtrl) {
 		
         //2.return the budget
 		var budget = budgetCtrl.getBudget();
-		console.log(budget);
+		
 		
 		//3.display the budget on the UI
 		UICtrl.displayBudget(budget);
@@ -235,8 +286,6 @@ var controller = (function (budgetCtrl, UICtrl) {
 			//2.add the item into the budget controller
 			
 			newItem = budgetCtrl.addItem(input.type, input.description, input.value);
-			
-			console.log(newItem);
 			
 			//3.add the item to the UI
 			
